@@ -1,0 +1,25 @@
+timezone: UTC
+report_day: sunday
+report_hour_utc: 18
+lookback_days: 7
+sources:
+  - name: FRED
+    type: macro_api
+    endpoint: https://api.stlouisfed.org/fred/series/observations
+    parser: fred_series_parser
+  - name: BLS
+    type: macro_api
+    endpoint: https://download.bls.gov/pub/time.series/
+    parser: bls_parser
+  - name: ECB SDW
+    type: macro_api
+    endpoint: https://data-api.ecb.europa.eu/service/data/
+    parser: ecb_parser
+  - name: SEC EDGAR
+    type: filings
+    endpoint: https://www.sec.gov/edgar/search/
+    parser: sec_filings_parser
+  - name: Reuters World News
+    type: geopolitics_feed
+    endpoint: https://www.reuters.com/world/
+    parser: geopolitics_news_parser
