@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthèse hebdomadaire des marchés</title>
+  <style>
+    :root {
+      --navy: #0b2a6f;
+      --gold: #d59a1a;
+      --bg: #f3f5fa;
+      --text: #1c2f5e;
+      --green: #15803d;
+      --red: #dc2626;
+      --border: #d8deef;
+    }
+    body { font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 16px; }
+    .report { max-width: 1400px; margin: 0 auto; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .header { display: grid; grid-template-columns: 90px 1fr 300px; gap: 16px; align-items: center; padding: 20px; }
+    .logo { border: 2px solid var(--gold); color: var(--navy); font-weight: 700; font-size: 48px; text-align: center; height: 70px; line-height: 70px; }
+    .title h1 { margin: 0; font-size: 54px; color: var(--navy); text-align: center; }
+    .title p { margin: 6px 0 0; text-align: center; color: var(--gold); font-size: 34px; font-weight: 700; }
+    .week { text-align: right; font-size: 18px; color: var(--navy); }
+    .week strong { display: block; font-size: 34px; }
+
+    .top-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 12px 12px; }
+    .panel { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: #fff; }
+    .panel-header { background: var(--navy); color: #f7c948; font-size: 34px; font-weight: 700; padding: 14px 18px; }
+    .panel-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .sub { padding: 12px 16px 18px; }
+    .sub h3 { margin: 4px 0 10px; font-size: 30px; color: var(--navy); }
+
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 8px 4px; font-size: 29px; border-bottom: 1px solid #ebeff9; }
+    td:last-child { text-align: right; font-weight: 700; }
+    .up { color: var(--green); }
+    .down { color: var(--red); }
+
+    .bottom-panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 0 12px 12px; }
+    .card { border: 1px solid var(--border); border-radius: 6px; background: #fff; padding: 12px 14px; }
+    .card h3 { margin: 0 0 10px; color: var(--navy); font-size: 33px; border-bottom: 2px solid #f6d78d; padding-bottom: 5px; }
+    .card ul { margin: 0; padding-left: 22px; }
+    .card li { margin-bottom: 8px; font-size: 27px; line-height: 1.35; }
+
+    .takeaway { display: grid; grid-template-columns: 1fr 320px; align-items: center; border-top: 1px solid var(--border); }
+    .takeaway p { margin: 0; padding: 16px; font-size: 32px; font-weight: 700; }
+    .signature { text-align: center; border-left: 2px solid #f2c35b; padding: 16px; color: var(--navy); font-size: 32px; font-weight: 700; }
+
+    @media (max-width: 1200px) {
+      .header, .top-panels, .bottom-panels, .takeaway { grid-template-columns: 1fr; }
+      .panel-body { grid-template-columns: 1fr; }
+      .week { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main class="report">
+    <section class="header">
+      <div class="logo">R</div>
+      <div class="title">
+        <h1>SYNTHÈSE HEBDOMADAIRE DES MARCHÉS</h1>
+        <p>PÉRIODE ANALYSÉE : DU {{ report.period_start.strftime('%d/%m') }} AU {{ report.period_end.strftime('%d/%m') }}</p>
+      </div>
+      <div class="week">
+        <strong>SEMAINE PASSÉE</strong>
+        Du {{ report.period_start.strftime('%d/%m') }} au {{ report.period_end.strftime('%d/%m') }}
+      </div>
+    </section>
+
+    <section class="top-panels">
+      <article class="panel">
+        <div class="panel-header">ÉVOLUTION SUR 7 JOURS (EN %)</div>
+        <div class="panel-body">
+          <div class="sub">
+            <h3>A. PRINCIPAUX INDICES</h3>
+            <table>
+              {% for item in report.market_moves %}
+              <tr>
+                <td>{{ item.name }}</td>
+                <td class="{{ 'up' if item.period_return_pct >= 0 else 'down' }}">
+                  {{ '%+.1f'|format(item.period_return_pct) }} %
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+          <div class="sub">
+            <h3>B. INDICES REMARQUABLES (ETF SPÉCIAUX)</h3>
+            <table>
+              {% for item in report.remarkable_moves %}
+              <tr>
+                <td>{{ item.name }}</td>
+                <td class="{{ 'up' if item.period_return_pct >= 0 else 'down' }}">
+                  {{ '%+.1f'|format(item.period_return_pct) }} %
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">INDICATEURS MACRO CLÉS</div>
+        <div class="panel-body">
+          <div class="sub" style="grid-column: span 2;">
+            <table>
+              {% for macro in report.macro_updates %}
+              <tr>
+                <td>{{ macro.name }}</td>
+                <td>
+                  {{ macro.value }} {{ macro.unit }}
+                  {% if macro.previous_value is not none %}
+                    (préc.: {{ macro.previous_value }} {{ macro.unit }})
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="bottom-panels">
+      <article class="card">
+        <h3>GÉOPOLITIQUE</h3>
+        <ul>
+          {% for event in report.geopolitical_updates %}
+          <li><strong>{{ event.title }}</strong> — {{ event.summary }} ({{ event.source }})</li>
+          {% endfor %}
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>BUSINESS ACTU</h3>
+        <ul>
+          {% for point in report.business_highlights %}
+          <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>POINTS D'ATTENTION</h3>
+        <ul>
+          {% for risk in report.risks %}
+          <li>{{ risk }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+    </section>
+
+    <section class="takeaway">
+      <p>💡 À RETENIR : {{ report.key_takeaway }}</p>
+      <div class="signature">AgentIAInvest — veille hebdomadaire</div>
+    </section>
+  </main>
+</body>
+</html>
