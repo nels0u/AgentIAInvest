@@ -1,0 +1,39 @@
+# Rapport hebdomadaire macro & marchés
+
+**Période analysée:** {{ report.period_start }} → {{ report.period_end }}  
+**Date de génération:** {{ report.generated_at }}
+
+## À retenir
+{{ report.key_takeaway }}
+
+## 1) Évolution marchés (7 jours)
+| Symbole | Nom | Catégorie | Perf. semaine |
+|---|---|---|---:|
+{% for item in report.market_moves -%}
+| {{ item.symbol }} | {{ item.name }} | {{ item.category }} | {{ "%+.2f"|format(item.period_return_pct) }}% |
+{% endfor %}
+
+## 2) Indicateurs macro clés
+| Indicateur | Valeur | Précédent | Date |
+|---|---:|---:|---|
+{% for macro in report.macro_updates -%}
+| {{ macro.name }} | {{ macro.value }} {{ macro.unit }} | {{ macro.previous_value if macro.previous_value is not none else "n/a" }} | {{ macro.release_date }} |
+{% endfor %}
+
+## 3) Géopolitique & impacts potentiels
+{% for geo in report.geopolitical_updates -%}
+- **{{ geo.title }}** ({{ geo.region }}, impact **{{ geo.impact_level }}**, source: {{ geo.source }}) : {{ geo.summary }}
+{% endfor %}
+
+## 4) Points d'attention (risques)
+{% for risk in report.risks -%}
+- {{ risk }}
+{% endfor %}
+
+## 5) Opportunités de suivi
+{% for opp in report.opportunities -%}
+- {{ opp }}
+{% endfor %}
+
+---
+*Document d'information. Pas un conseil financier personnalisé.*
