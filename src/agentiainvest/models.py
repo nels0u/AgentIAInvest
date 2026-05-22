@@ -3,7 +3,12 @@ from __future__ import annotations
 from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import AnyUrl, BaseModel, Field
+
+
+class SourceLink(BaseModel):
+    label: str
+    url: AnyUrl
 
 
 class AssetSnapshot(BaseModel):
@@ -12,6 +17,7 @@ class AssetSnapshot(BaseModel):
     category: Literal["index", "etf", "equity", "bond", "commodity", "fx", "crypto"]
     period_return_pct: float
     previous_period_return_pct: float | None = None
+    source_url: AnyUrl
 
 
 class MacroIndicator(BaseModel):
@@ -20,6 +26,7 @@ class MacroIndicator(BaseModel):
     unit: str
     release_date: date
     previous_value: float | None = None
+    source_url: AnyUrl
 
 
 class GeopoliticalEvent(BaseModel):
@@ -29,11 +36,12 @@ class GeopoliticalEvent(BaseModel):
     date: date
     impact_level: Literal["low", "medium", "high"]
     summary: str
+    source_url: AnyUrl
 
 
-class HighlightSection(BaseModel):
-    title: str
-    bullets: list[str]
+class NarrativePoint(BaseModel):
+    text: str
+    source: SourceLink
 
 
 class WeeklyReport(BaseModel):
@@ -44,11 +52,12 @@ class WeeklyReport(BaseModel):
     market_moves: list[AssetSnapshot]
     remarkable_moves: list[AssetSnapshot] = Field(default_factory=list)
     quarterly_market_moves: list[AssetSnapshot] = Field(default_factory=list)
+    quarterly_remarkable_moves: list[AssetSnapshot] = Field(default_factory=list)
     macro_updates: list[MacroIndicator]
     geopolitical_updates: list[GeopoliticalEvent]
     risks: list[str]
     opportunities: list[str]
     business_highlights: list[str] = Field(default_factory=list)
-    geopolitical_narrative: list[str] = Field(default_factory=list)
-    business_narrative: list[str] = Field(default_factory=list)
-    risk_narrative: list[str] = Field(default_factory=list)
+    geopolitical_narrative: list[NarrativePoint] = Field(default_factory=list)
+    business_narrative: list[NarrativePoint] = Field(default_factory=list)
+    risk_narrative: list[NarrativePoint] = Field(default_factory=list)
