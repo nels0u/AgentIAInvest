@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthèse hebdomadaire des marchés</title>
+  <style>
+    :root{--n900:#102650;--n700:#2a4f8f;--s900:#1f2f4d;--s700:#445a80;--line:#d9e2f1;--bg:#eef3fb;--card:#fff;--up:#188247;--down:#c83a3a;--shadow:0 14px 34px rgba(16,38,80,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#f9fbff 0%,var(--bg)100%);color:var(--s900);padding:24px}
+    .sheet{max-width:1380px;margin:0 auto;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+    .header{padding:24px 28px;border-bottom:1px solid #e5ebf7;background:linear-gradient(180deg,#fff,#f9fbff);display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:end}
+    h1{margin:0;color:var(--n900);font-size:clamp(32px,3.1vw,52px)} .sub{margin-top:8px;color:var(--s700);font-size:18px}
+    .period{text-align:right;color:var(--s700);font-size:14px;line-height:1.45}.period strong{display:block;font-size:22px;color:var(--n900)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px}
+    .panel{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.ph{padding:12px 15px;background:linear-gradient(90deg,var(--n900),var(--n700));color:#f6e3b0;font-weight:700;font-size:20px}
+    .split{display:grid;grid-template-columns:1fr 1fr}.col{padding:14px}.col+.col{border-left:1px solid #e8edf8}.col h3{margin:0 0 10px;font-size:17px;color:var(--n900);text-transform:uppercase}
+    table{width:100%;border-collapse:collapse}tr{border-bottom:1px solid #edf2fa}tr:last-child{border-bottom:0}td{padding:7px 0;font-size:15px;color:var(--s700)}td:last-child{text-align:right;font-weight:700}
+    .up{color:var(--up)}.down{color:var(--down)}
+    .asset-link,.inline-link{color:inherit;text-decoration:none;border-bottom:1px dashed #9fb0cf}.asset-link:hover,.inline-link:hover{color:var(--n700);border-bottom-color:var(--n700)}
+    .etf-logo{display:inline-grid;place-items:center;width:18px;height:18px;border:1px solid #d8e2f3;border-radius:4px;background:#f6f9ff;font-size:12px;margin-right:6px;color:var(--n700)}
+    .insights{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:0 14px 14px}
+    .card{border:1px solid var(--line);border-radius:12px;padding:14px;background:linear-gradient(180deg,#fff,#fcfdff);min-height:320px}
+    .card h3{margin:0 0 10px;color:var(--n900);font-size:22px;border-bottom:2px solid #ecd8aa;padding-bottom:6px}
+    .card p{margin:0 0 10px;font-size:15px;line-height:1.46;color:var(--s700)}
+    .takeaway{margin:0 14px 14px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:linear-gradient(90deg,#fffef8,#fff);font-size:18px;font-weight:640}
+    @media (max-width:1120px){.header{grid-template-columns:1fr}.period{text-align:left}.grid,.insights,.split{grid-template-columns:1fr}.col+.col{border-left:0;border-top:1px solid #e8edf8}}
+  </style>
+</head>
+<body>
+<main class="sheet">
+  <section class="header">
+    <div>
+      <h1>Synthèse hebdomadaire des marchés</h1>
+      <div class="sub">Période analysée du {{ report.period_start.strftime('%d/%m/%Y') }} au {{ report.period_end.strftime('%d/%m/%Y') }}</div>
+    </div>
+    <div class="period"><strong>Lecture de la semaine</strong>Rapport généré le {{ report.generated_at.strftime('%d/%m/%Y') }}</div>
+  </section>
+
+  <section class="grid">
+    <article class="panel">
+      <div class="ph">Évolution du marché sur 7 jours</div>
+      <div class="split">
+        <div class="col">
+          <h3>Principaux indices</h3>
+          <table>{% for item in report.market_moves %}<tr><td><a class="asset-link" href="{{ item.source_url }}" target="_blank">{{ item.name }}</a></td><td class="{{ 'up' if item.period_return_pct>=0 else 'down' }}">{{ '%+.1f'|format(item.period_return_pct) }} %</td></tr>{% endfor %}</table>
+        </div>
+        <div class="col">
+          <h3>ETF & segments remarquables</h3>
+          <table>{% for item in report.remarkable_moves %}<tr><td><span class="etf-logo">◎</span><a class="asset-link" href="{{ item.source_url }}" target="_blank">{{ item.name }}</a></td><td class="{{ 'up' if item.period_return_pct>=0 else 'down' }}">{{ '%+.1f'|format(item.period_return_pct) }} %</td></tr>{% endfor %}</table>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="ph">Évolution du marché sur 3 mois</div>
+      <div class="split">
+        <div class="col">
+          <h3>Principaux indices</h3>
+          <table>{% for item in report.quarterly_market_moves %}<tr><td><a class="asset-link" href="{{ item.source_url }}" target="_blank">{{ item.name }}</a></td><td class="{{ 'up' if item.period_return_pct>=0 else 'down' }}">{{ '%+.1f'|format(item.period_return_pct) }} %</td></tr>{% endfor %}</table>
+        </div>
+        <div class="col">
+          <h3>ETF & segments remarquables</h3>
+          <table>{% for item in report.quarterly_remarkable_moves %}<tr><td><span class="etf-logo">◎</span><a class="asset-link" href="{{ item.source_url }}" target="_blank">{{ item.name }}</a></td><td class="{{ 'up' if item.period_return_pct>=0 else 'down' }}">{{ '%+.1f'|format(item.period_return_pct) }} %</td></tr>{% endfor %}</table>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="insights">
+    <article class="card"><h3>🌍 Géopolitique</h3>{% for p in report.geopolitical_narrative %}<p><a class="inline-link" href="{{ p.source.url }}" target="_blank">{{ p.text|safe }}</a></p>{% endfor %}</article>
+    <article class="card"><h3>📰 Business actu</h3>{% for p in report.business_narrative %}<p><a class="inline-link" href="{{ p.source.url }}" target="_blank">{{ p.text|safe }}</a></p>{% endfor %}</article>
+    <article class="card"><h3>⚠️ Points d'attention</h3>{% for p in report.risk_narrative %}<p><a class="inline-link" href="{{ p.source.url }}" target="_blank">{{ p.text|safe }}</a></p>{% endfor %}</article>
+  </section>
+
+  <section class="takeaway">💡 À retenir : {{ report.key_takeaway }}</section>
+</main>
+</body>
+</html>
