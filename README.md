@@ -5,7 +5,7 @@ Agent IA orienté **veille macroéconomique, marchés financiers et géopolitiqu
 ## Ce que fait ce socle
 - Charge une configuration de sources officielles (macro, filings, news).
 - Normalise les données dans des modèles typés (`pydantic`).
-- Génère un rapport Markdown hebdomadaire via template Jinja.
+- Génère un rapport hebdomadaire en **HTML (email-ready)** via template Jinja.
 - Prépare l'automatisation (cron/GitHub Actions) pour une génération récurrente.
 
 ## Démarrage rapide
@@ -16,7 +16,14 @@ pip install -r requirements.txt
 PYTHONPATH=src python -m agentiainvest.main
 ```
 
-Le rapport est exporté dans `output/weekly_report_YYYY-MM-DD.md`.
+Le rapport est exporté dans `output/weekly_report_YYYY-MM-DD.html`.
+
+## Rendu visuel type "synthèse marché"
+Le template HTML (`prompts/weekly_report.html.j2`) suit une structure proche de votre exemple :
+- en-tête fort avec période analysée,
+- deux panneaux de données (marchés + macro),
+- trois cartes de contexte (géopolitique, business, points d'attention),
+- section "À retenir" en bas de page.
 
 ## Architecture recommandée (prochaine étape)
 1. **Ingestion**: connecter les parseurs réels pour FRED/BLS/ECB/SEC + news géopolitiques.
